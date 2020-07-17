@@ -555,7 +555,9 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
                     this.callbackContext.success(uri.toString());
                 }
             } else {
-                Uri uri = Uri.fromFile(createCaptureFile(this.encodingType, System.currentTimeMillis() + ""));
+                Uri uri = (destType == NATIVE_URI)
+                    ? Uri.fromFile(new File(getPicturesPath()))
+                    : Uri.fromFile(createCaptureFile(this.encodingType, System.currentTimeMillis() + ""));
                 bitmap = getScaledAndRotatedBitmap(sourcePath);
 
                 // Double-check the bitmap.
@@ -584,6 +586,8 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
                         exif.resetOrientation();
                     exif.createOutFile(exifPath);
                     exif.writeExifData();
+                    if(destType == NATIVE_URI)
+                        refreshGallery(galleryUri);
                 }
 
                 // Send Uri back to JavaScript for viewing image
